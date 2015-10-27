@@ -20,7 +20,9 @@
  * MA 02110-1301  USA
  */
 
-package src.helper;
+package src.helper.clases;
+
+import java.util.List;
 
 /**
  * Clase que representa a una produccion de la forma A:BC donde A es izquierda y
@@ -33,41 +35,41 @@ package src.helper;
  */
 public class Produccion {
 
-    public Produccion(String izquierda, String derecha) {
+	public Produccion(String izquierda, List<String> derecha) {
 
-        super();
-        this.izquierda = izquierda;
-        this.derecha = derecha;
-    }
+		super();
+		this.izquierda = izquierda;
+		this.derecha = derecha;
+	}
 
-    private String izquierda;
+	private String izquierda;
 
-    @Override
-    public String toString() {
+	@Override
+	public String toString() {
 
-        return izquierda + "->" + derecha;
-    }
+		return izquierda + "->" + derecha;
+	}
 
-    private String derecha;
+	private List<String> derecha;
 
-    public String getIzquierda() {
+	public String getIzquierda() {
 
-        return izquierda;
-    }
+		return izquierda;
+	}
 
-    public void setIzquierda(String izquierda) {
+	public void setIzquierda(String izquierda) {
 
-        this.izquierda = izquierda;
-    }
+		this.izquierda = izquierda;
+	}
 
-    public String getDerecha() {
+	public List<String> getDerecha() {
 
-        return derecha;
-    }
+		return derecha;
+	}
 
-    public void setDerecha(String derecha) {
+	public void setDerecha(List<String> derecha) {
 
-        this.derecha = derecha;
-    }
+		this.derecha = derecha;
+	}
 
 }

@@ -25,6 +25,9 @@ package src.helper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+
+import src.helper.clases.Produccion;
 
 /**
  * Clase de ejemplo de la utilizacion de {@link ASPHelper}
@@ -36,36 +39,61 @@ import java.util.Scanner;
  */
 public class ASPMain {
 
-    private static Scanner teclado;
+	private static Scanner teclado;
 
-    public static void main(String[] ar) {
+	public static void main(String[] ar) {
 
-        teclado = new Scanner(System.in);
-        System.out.println("Ingrese cantidad de producciones");
-        System.out.println();
-        Integer numProd = teclado.nextInt();
-        System.out
-                .println("Cada variable debe ser de un solo caracter. Vacio se representa con: vacio");
+		Integer numProd;
+		Integer numIzq;
+		List<Produccion> producciones = new ArrayList<Produccion>();
+		List<String> derecha = new ArrayList<String>();
+		ASPHelper helper = null;
+		String ladoIzq;
 
-        List<Produccion> producciones = new ArrayList<Produccion>();
-        for (int i = 0; i < numProd; i++) {
+		teclado = new Scanner(System.in);
+		System.out.println("Vacio se representa con: vacio");
+		System.out.println();
 
-            teclado = new Scanner(System.in);
+		System.out.println("Ingrese cantidad de producciones");
 
-            System.out.println("Ingrese la produccion de la forma A:BC");
-            System.out.println();
-            String aux = teclado.next();
-            producciones.add(new Produccion(aux.split(":")[0],
-                    aux.split(":")[1]));
+		teclado = new Scanner(System.in);
+		numProd = teclado.nextInt();
 
-        }
-        ASPHelper helper;
-        // Impresion y llamada a funcion primero
-        for (Produccion prod : producciones) {
-            helper = new ASPHelper(producciones);
-            System.out.println("Primero de " + prod.getIzquierda()
-                    + helper.getPrimero(prod.getIzquierda()));
-        }
-    }
+		for (int i = 0; i < numProd; i++) {
 
+			System.out.println("Ingrese el lado izquierdo de la produccion "
+					+ i);
+			System.out.println();
+			ladoIzq = teclado.next();
+			System.out
+					.println("Ingrese la cantidad de variables del lado izquierdo para "
+							+ ladoIzq);
+			System.out.println();
+			numIzq = teclado.nextInt();
+
+			for (int j = 0; j < numIzq; j++) {
+				System.out.println("Ingrese variable " + j
+						+ " del lado izquierdo");
+				System.out.println();
+
+				derecha.add(teclado.next());
+			}
+			producciones.add(new Produccion(ladoIzq, derecha));
+			derecha = new ArrayList<String>();
+		}
+
+		// Impresion y llamada a funcion primero
+
+		helper = new ASPHelper(producciones);
+		Set<String> noTerminales = helper.getNoTerminales();
+		System.out.println("Gramatica ingresada:");
+		for (Produccion prod : producciones) {
+			System.out.println(prod);
+		}
+		for (String it : noTerminales) {
+			helper = new ASPHelper(producciones);
+			System.out.println("Primero de " + it + helper.getPrimero(it));
+		}
+
+	}
 }

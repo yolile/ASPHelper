@@ -23,7 +23,11 @@
 package src.helper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import src.helper.clases.Produccion;
 
 /**
  *
@@ -34,148 +38,171 @@ import java.util.List;
  */
 public class ASPHelper {
 
-    private List<Produccion> producciones;
-    private List<String> conjuntoPrimero;
+	private List<Produccion> producciones;
+	private List<String> conjuntoPrimero;
 
-    public ASPHelper(List<Produccion> producciones) {
+	public ASPHelper(List<Produccion> producciones) {
 
-        super();
-        this.producciones = producciones;
-        this.conjuntoPrimero = new ArrayList<String>();
-    }
+		super();
+		this.producciones = producciones;
+		this.conjuntoPrimero = new ArrayList<String>();
+	}
 
-    /**
-     * Metodo para determinar si una variable dada es o no un terminal, segun la
-     * lista de producciones seteada en el constructor de la clase
-     *
-     * @param variable
-     * @return
-     */
-    private boolean esTerminal(String variable) {
+	public Set<String> getTerminales() {
 
-        for (Produccion prod : getProducciones()) {
-            if (prod.getIzquierda().contains(variable)) {
-                return false;
-            }
+		Set<String> aRet = new HashSet<String>();
+		for (Produccion prod : getProducciones()) {
+			for (String variable : prod.getDerecha()) {
+				if (esTerminal(variable)) {
+					aRet.add(variable);
+				}
+			}
+		}
+		return aRet;
+	}
 
-        }
-        return true;
+	public Set<String> getNoTerminales() {
 
-    }
+		Set<String> aRet = new HashSet<String>();
+		for (Produccion prod : getProducciones()) {
+			if (!esTerminal(prod.getIzquierda())) {
+				aRet.add(prod.getIzquierda());
+			}
+		}
+		return aRet;
+	}
 
-    /**
-     * Metodo para determinar, dada una varible X, y una lista de producciones
-     * definida en el constructor, si X puede derivar a vacio
-     *
-     * @param variable
-     * @return
-     */
-    private boolean derivaAvacio(String variable) {
+	/**
+	 * Metodo para determinar si una variable dada es o no un terminal, segun la
+	 * lista de producciones seteada en el constructor de la clase
+	 *
+	 * @param variable
+	 * @return
+	 */
+	private boolean esTerminal(String variable) {
 
-        for (Produccion prod : getProducciones()) {
-            if (prod.getIzquierda().equals(variable)
-                    && prod.getDerecha().equals("vacio")) {
-                return true;
+		for (Produccion prod : getProducciones()) {
+			if (prod.getIzquierda().contains(variable)) {
+				return false;
+			}
 
-            }
+		}
+		return true;
 
-        }
-        return false;
+	}
 
-    }
+	/**
+	 * Metodo para determinar, dada una varible X, y una lista de producciones
+	 * definida en el constructor, si X puede derivar a vacio
+	 *
+	 * @param variable
+	 * @return
+	 */
+	private boolean derivaAvacio(String variable) {
 
-    /**
-     * Metodo para obtener el conjunto primero de una variable dada
-     *
-     * @param variable
-     * @return
-     */
-    public List<String> getPrimero(String variable) {
+		for (Produccion prod : getProducciones()) {
+			if (prod.getIzquierda().equals(variable)
+					&& prod.getDerecha().get(0).equals("vacio")) {
+				return true;
 
-        List<String> aRetornar = primero(variable);
+			}
 
-        // Luego de calcular el conjunto primero, agregamos vacio si es que
-        // varible deriva en vacio
-        for (Produccion prod : getProducciones()) {
-            if (prod.getIzquierda().equals(variable)
-                    && prod.getDerecha().equals("vacio")) {
-                aRetornar.add("vacio");
-            }
-        }
+		}
+		return false;
 
-        return aRetornar;
-    }
+	}
 
-    private List<String> primero(String variable) {
+	/**
+	 * Metodo para obtener el conjunto primero de una variable dada
+	 *
+	 * @param variable
+	 * @return
+	 */
+	public List<String> getPrimero(String variable) {
 
-        // Si es un terminal se agrega al conjunto primero
-        if (esTerminal(variable)) {
-            getConjuntoPrimero().add(variable);
-            return getConjuntoPrimero();
-        }
+		List<String> aRetornar = primero(variable);
 
-        for (Produccion prod : getProducciones()) {
-            if (prod.getIzquierda().equals(variable)) {
-                if (!prod.getDerecha().equals("vacio")) {
+		// Luego de calcular el conjunto primero, agregamos vacio si es que
+		// varible deriva en vacio
+		for (Produccion prod : getProducciones()) {
+			if (prod.getIzquierda().equals(variable)
+					&& prod.getDerecha().get(0).equals("vacio")) {
+				aRetornar.add("vacio");
+			}
+		}
 
-                    // la primera variable del lado derecho siempre estara en el
-                    // conjunto primero
-                    primero(String.valueOf(prod.getDerecha().charAt(0)));
-                    for (int i = 0; i < prod.getDerecha().length() - 1; i++) {
-                        // si la primera variable deriva en vacio, entonces hay
-                        // que agregar el conjunto primero de la siguiente, y
-                        // asi sucesivamente
-                        if (derivaAvacio(String.valueOf(prod.getDerecha()
-                                .charAt(i)))) {
-                            primero(String.valueOf(prod.getDerecha().charAt(
-                                    i + 1)));
+		return aRetornar;
+	}
 
-                        }
-                    }
-                }
-            }
-        }
+	private List<String> primero(String variable) {
 
-        return getConjuntoPrimero();
+		// Si es un terminal se agrega al conjunto primero
+		if (esTerminal(variable)) {
+			getConjuntoPrimero().add(variable);
+			return getConjuntoPrimero();
+		}
 
-    }
+		for (Produccion prod : getProducciones()) {
+			if (prod.getIzquierda().equals(variable)) {
+				if (!prod.getDerecha().get(0).equals("vacio")) {
 
-    /**
-     * Metodo que dado un String devuelve su respectiva {@link Produccion}
-     *
-     * @param variable
-     * @param producciones
-     * @return
-     */
-    public static Produccion getProduccion(String variable,
-            List<Produccion> producciones) {
+					// la primera variable del lado derecho siempre estara en el
+					// conjunto primero
+					primero(prod.getDerecha().get(0));
+					for (int i = 0; i < prod.getDerecha().size() - 1; i++) {
+						// si la primera variable deriva en vacio, entonces hay
+						// que agregar el conjunto primero de la siguiente, y
+						// asi sucesivamente
+						if (derivaAvacio(prod.getDerecha().get(i))) {
+							primero(String
+									.valueOf(prod.getDerecha().get(i + 1)));
 
-        for (Produccion prod : producciones) {
-            if (prod.getIzquierda().equals(variable)) {
-                return prod;
-            }
-        }
-        return null;
-    }
+						}
+					}
+				}
+			}
+		}
 
-    public List<Produccion> getProducciones() {
+		return getConjuntoPrimero();
 
-        return producciones;
-    }
+	}
 
-    public void setProducciones(List<Produccion> producciones) {
+	/**
+	 * Metodo que dado un String devuelve su respectiva {@link Produccion}
+	 *
+	 * @param variable
+	 * @param producciones
+	 * @return
+	 */
+	public static Produccion getProduccion(String variable,
+			List<Produccion> producciones) {
 
-        this.producciones = producciones;
-    }
+		for (Produccion prod : producciones) {
+			if (prod.getIzquierda().equals(variable)) {
+				return prod;
+			}
+		}
+		return null;
+	}
 
-    public List<String> getConjuntoPrimero() {
+	public List<Produccion> getProducciones() {
 
-        return conjuntoPrimero;
-    }
+		return producciones;
+	}
 
-    public void setConjuntoPrimero(List<String> conjuntoPrimero) {
+	public void setProducciones(List<Produccion> producciones) {
 
-        this.conjuntoPrimero = conjuntoPrimero;
-    }
+		this.producciones = producciones;
+	}
+
+	public List<String> getConjuntoPrimero() {
+
+		return conjuntoPrimero;
+	}
+
+	public void setConjuntoPrimero(List<String> conjuntoPrimero) {
+
+		this.conjuntoPrimero = conjuntoPrimero;
+	}
 
 }
