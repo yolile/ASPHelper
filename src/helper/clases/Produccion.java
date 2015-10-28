@@ -35,22 +35,23 @@ import java.util.List;
  */
 public class Produccion {
 
-	public Produccion(String izquierda, List<String> derecha) {
+	public Produccion(String izquierda, List<String> derecha, boolean procesado) {
 
 		super();
 		this.izquierda = izquierda;
 		this.derecha = derecha;
+		this.procesado = procesado;
 	}
 
 	private String izquierda;
+	private boolean procesado;
+	private List<String> derecha;
 
 	@Override
 	public String toString() {
 
 		return izquierda + "->" + derecha;
 	}
-
-	private List<String> derecha;
 
 	public String getIzquierda() {
 
@@ -70,6 +71,14 @@ public class Produccion {
 	public void setDerecha(List<String> derecha) {
 
 		this.derecha = derecha;
+	}
+
+	public boolean isProcesado() {
+		return procesado;
+	}
+
+	public void setProcesado(boolean procesado) {
+		this.procesado = procesado;
 	}
 
 }

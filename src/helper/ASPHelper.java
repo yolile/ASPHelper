@@ -38,6 +38,7 @@ import src.helper.clases.Produccion;
  */
 public class ASPHelper {
 
+	public static final String VACIO = "vacio";
 	private List<Produccion> producciones;
 	private List<String> conjuntoPrimero;
 
@@ -92,72 +93,71 @@ public class ASPHelper {
 	}
 
 	/**
-	 * Metodo para determinar, dada una varible X, y una lista de producciones
-	 * definida en el constructor, si X puede derivar a vacio
-	 *
-	 * @param variable
-	 * @return
-	 */
-	private boolean derivaAvacio(String variable) {
-
-		for (Produccion prod : getProducciones()) {
-			if (prod.getIzquierda().equals(variable)
-					&& prod.getDerecha().get(0).equals("vacio")) {
-				return true;
-
-			}
-
-		}
-		return false;
-
-	}
-
-	/**
 	 * Metodo para obtener el conjunto primero de una variable dada
 	 *
 	 * @param variable
 	 * @return
 	 */
-	public List<String> getPrimero(String variable) {
+	public Set<String> getPrimero(String original, String variable) {
 
-		List<String> aRetornar = primero(variable);
-
-		// Luego de calcular el conjunto primero, agregamos vacio si es que
-		// varible deriva en vacio
+		// Se ponen todas las producciones como no procesadas
 		for (Produccion prod : getProducciones()) {
-			if (prod.getIzquierda().equals(variable)
-					&& prod.getDerecha().get(0).equals("vacio")) {
-				aRetornar.add("vacio");
+			prod.setProcesado(false);
+		}
+		// Creamos un hashSet para quitar duplicados
+		Set<String> temp = new HashSet<String>();
+		List<String> aRetornar = primero(original, variable);
+		int contadorVacio = 0;
+		int contadorNoVacio = 0;
+		// Si existe la misma cantidad de variables que de vacio, significa que
+		// cada una de ellas aporto vacio, por lo tanto hay que agregar vacio al
+		// conjunto primero una vez
+		for (String term : aRetornar) {
+			if (term.equals(VACIO)) {
+				contadorVacio++;
+			} else {
+				contadorNoVacio++;
 			}
 		}
+		temp.addAll(aRetornar);
+		// Si hay diferentes cantidades de vacio y de variables, significa que
+		// no todas aportaron vacio y vacio debe eliminarse
+		if (contadorVacio != contadorNoVacio) {
 
-		return aRetornar;
+			temp.remove(VACIO);
+
+		}
+
+		return temp;
 	}
 
-	private List<String> primero(String variable) {
+	private List<String> primero(String original, String variable) {
 
 		// Si es un terminal se agrega al conjunto primero
 		if (esTerminal(variable)) {
 			getConjuntoPrimero().add(variable);
-			return getConjuntoPrimero();
+
 		}
 
 		for (Produccion prod : getProducciones()) {
-			if (prod.getIzquierda().equals(variable)) {
-				if (!prod.getDerecha().get(0).equals("vacio")) {
+			// se pregunta si ya no se proceso para evitar duplicados
+			if (prod.getIzquierda().equals(variable) && !prod.isProcesado()) {
 
-					// la primera variable del lado derecho siempre estara en el
-					// conjunto primero
-					primero(prod.getDerecha().get(0));
-					for (int i = 0; i < prod.getDerecha().size() - 1; i++) {
-						// si la primera variable deriva en vacio, entonces hay
-						// que agregar el conjunto primero de la siguiente, y
-						// asi sucesivamente
-						if (derivaAvacio(prod.getDerecha().get(i))) {
-							primero(String
-									.valueOf(prod.getDerecha().get(i + 1)));
+				// la primera variable del lado derecho siempre estara en el
+				// conjunto primero
+				prod.setProcesado(true);
+				List<String> temp = primero(prod.getIzquierda(), prod
+						.getDerecha().get(0));
 
-						}
+				for (int i = 0; i < prod.getDerecha().size() - 1; i++) {
+					// si la primera variable deriva en vacio, entonces hay
+					// que agregar el conjunto primero de la siguiente, y
+					// asi sucesivamente
+					if (temp.contains(VACIO)) {
+						primero(original, prod.getDerecha().get(i + 1));
+
+					} else {
+						break;
 					}
 				}
 			}
@@ -165,24 +165,6 @@ public class ASPHelper {
 
 		return getConjuntoPrimero();
 
-	}
-
-	/**
-	 * Metodo que dado un String devuelve su respectiva {@link Produccion}
-	 *
-	 * @param variable
-	 * @param producciones
-	 * @return
-	 */
-	public static Produccion getProduccion(String variable,
-			List<Produccion> producciones) {
-
-		for (Produccion prod : producciones) {
-			if (prod.getIzquierda().equals(variable)) {
-				return prod;
-			}
-		}
-		return null;
 	}
 
 	public List<Produccion> getProducciones() {

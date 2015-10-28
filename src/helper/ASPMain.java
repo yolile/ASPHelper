@@ -51,7 +51,7 @@ public class ASPMain {
 		String ladoIzq;
 
 		teclado = new Scanner(System.in);
-		System.out.println("Vacio se representa con: vacio");
+		System.out.println("Vacio se representa con: " + ASPHelper.VACIO);
 		System.out.println();
 
 		System.out.println("Ingrese cantidad de producciones");
@@ -78,7 +78,7 @@ public class ASPMain {
 
 				derecha.add(teclado.next());
 			}
-			producciones.add(new Produccion(ladoIzq, derecha));
+			producciones.add(new Produccion(ladoIzq, derecha, false));
 			derecha = new ArrayList<String>();
 		}
 
@@ -92,7 +92,7 @@ public class ASPMain {
 		}
 		for (String it : noTerminales) {
 			helper = new ASPHelper(producciones);
-			System.out.println("Primero de " + it + helper.getPrimero(it));
+			System.out.println("Primero de " + it + helper.getPrimero(it, it));
 		}
 
 	}
