@@ -92,7 +92,7 @@ public class ASPMain {
 		}
 		for (String it : noTerminales) {
 			helper = new ASPHelper(producciones);
-			System.out.println("Primero de " + it + helper.getPrimero(it, it));
+			System.out.println("Primero de " + it + helper.getPrimero(it));
 		}
 
 	}

@@ -98,7 +98,7 @@ public class ASPHelper {
 	 * @param variable
 	 * @return
 	 */
-	public Set<String> getPrimero(String original, String variable) {
+	public Set<String> getPrimero(String variable) {
 
 		// Se ponen todas las producciones como no procesadas
 		for (Produccion prod : getProducciones()) {
@@ -106,7 +106,7 @@ public class ASPHelper {
 		}
 		// Creamos un hashSet para quitar duplicados
 		Set<String> temp = new HashSet<String>();
-		List<String> aRetornar = primero(original, variable);
+		List<String> aRetornar = primero(variable);
 		int contadorVacio = 0;
 		int contadorNoVacio = 0;
 		// Si existe la misma cantidad de variables que de vacio, significa que
@@ -131,7 +131,7 @@ public class ASPHelper {
 		return temp;
 	}
 
-	private List<String> primero(String original, String variable) {
+	private List<String> primero(String variable) {
 
 		// Si es un terminal se agrega al conjunto primero
 		if (esTerminal(variable)) {
@@ -146,15 +146,14 @@ public class ASPHelper {
 				// la primera variable del lado derecho siempre estara en el
 				// conjunto primero
 				prod.setProcesado(true);
-				List<String> temp = primero(prod.getIzquierda(), prod
-						.getDerecha().get(0));
+				List<String> temp = primero(prod.getDerecha().get(0));
 
 				for (int i = 0; i < prod.getDerecha().size() - 1; i++) {
 					// si la primera variable deriva en vacio, entonces hay
 					// que agregar el conjunto primero de la siguiente, y
 					// asi sucesivamente
 					if (temp.contains(VACIO)) {
-						primero(original, prod.getDerecha().get(i + 1));
+						primero(prod.getDerecha().get(i + 1));
 
 					} else {
 						break;
