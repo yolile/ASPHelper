@@ -23,7 +23,9 @@
 package src.helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -31,11 +33,11 @@ import src.helper.clases.Produccion;
 
 /**
  * Clase de ejemplo de la utilizacion de {@link ASPHelper}
- *
+ * 
  * @author Yohanna Lisnichuk
  * @since 1.0
  * @version 1.0 25/10/2015
- *
+ * 
  */
 public class ASPMain {
 
@@ -43,43 +45,55 @@ public class ASPMain {
 
 	public static void main(String[] ar) {
 
-		Integer numProd;
-		Integer numIzq;
 		List<Produccion> producciones = new ArrayList<Produccion>();
 		List<String> derecha = new ArrayList<String>();
 		ASPHelper helper = null;
 		String ladoIzq;
+		String separador;
 
 		teclado = new Scanner(System.in);
-		System.out.println("Vacio se representa con: " + ASPHelper.VACIO);
+		System.out.println("Cualquier contenido ingresado despues de un espacio en blanco sera ignorado\nVacio se representa con: vacio");
 		System.out.println();
 
-		System.out.println("Ingrese cantidad de producciones");
-
+		String entrada;
 		teclado = new Scanner(System.in);
-		numProd = teclado.nextInt();
 
-		for (int i = 0; i < numProd; i++) {
+		System.out.println("Ingrese separador a utilizar en el lado derecho de las producciones");
+		separador = teclado.next();
 
-			System.out.println("Ingrese el lado izquierdo de la produccion "
-					+ i);
-			System.out.println();
-			ladoIzq = teclado.next();
-			System.out
-					.println("Ingrese la cantidad de variables del lado izquierdo para "
-							+ ladoIzq);
-			System.out.println();
-			numIzq = teclado.nextInt();
+		System.out
+		.println("Ingrese producciones, para terminar ingrese FIN");
+		entrada = teclado.next();
 
-			for (int j = 0; j < numIzq; j++) {
-				System.out.println("Ingrese variable " + j
-						+ " del lado izquierdo");
-				System.out.println();
+		while (!entrada.equals("FIN")) {
+			if (!entrada.contains("->")) {
+				System.out.println("produccion invalida");
+				teclado.nextLine();
+				entrada = teclado.next();
+				continue;
+			}
 
-				derecha.add(teclado.next());
+			String[] entradas = entrada.split("->", 2);
+
+			if (entradas[1].equals("")) {
+				System.out.println("falta lado derecho");
+				teclado.nextLine();
+				entrada = teclado.next();
+				continue;
+			}
+
+			String[] variables = entradas[1].split(separador);
+			ladoIzq = (entradas[0]);
+			derecha = new ArrayList<String>();
+
+			int k;
+			for (k = 0; k < variables.length; k++) {
+				if (!variables[k].equals(""))
+					derecha.add(variables[k]);
 			}
 			producciones.add(new Produccion(ladoIzq, derecha, false));
-			derecha = new ArrayList<String>();
+			teclado.nextLine();
+			entrada = teclado.next();
 		}
 
 		// Impresion y llamada a funcion primero
@@ -90,9 +104,16 @@ public class ASPMain {
 		for (Produccion prod : producciones) {
 			System.out.println(prod);
 		}
+		Map<String, Set<String>> primeros = new HashMap<String, Set<String>>();
 		for (String it : noTerminales) {
 			helper = new ASPHelper(producciones);
-			System.out.println("Primero de " + it + helper.getPrimero(it));
+			Set<String> temp = helper.getPrimero(it);
+			System.out.println("Primero de " + it + temp);
+			primeros.put(it, temp);
+		}
+		for (String it : noTerminales) {
+			helper = new ASPHelper(producciones);
+			System.out.println("Siguiente de " + it + helper.getSiguiente(primeros,it));
 		}
 
 	}
