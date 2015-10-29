@@ -31,6 +31,8 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Stack;
+
+import src.helper.clases.Key;
 import src.helper.clases.Produccion;
 
 /**
@@ -101,7 +103,8 @@ public class ASPMain {
             teclado.nextLine();
             entrada = teclado.next();
         }
-
+        
+        
         // Impresion y llamada a funcion primero
 
         helper = new ASPHelper(producciones);
@@ -125,7 +128,23 @@ public class ASPMain {
             siguientes.put(it, temp);
         }
         ASPTable tabla = new ASPTable(primeros, siguientes, producciones);
-        System.out.println(tabla.generarTablaASP());
-
+        Map<Key, List<Produccion>> tablaGen = (tabla.generarTablaASP());
+        System.out.println(tablaGen);
+        
+        System.out.println("Ingrese Entrada a probar");
+        teclado.nextLine();
+        entrada = teclado.next();
+        String[] entradas = entrada.split(separador);
+        
+        for(int k=0; k< entradas.length; k++)
+        {
+        	input.add(entradas[k]);
+        }
+        
+        stack.add("$");
+        stack.add(producciones.get(0).getIzquierda());
+        
+        ASPParser.parser(input, stack, tablaGen, producciones); 
+                
     }
 }

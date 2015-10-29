@@ -35,9 +35,9 @@ public class Key {
 		if (getClass() != obj.getClass())
 			return false;
 		Key other = (Key) obj;
-		if (terminal != other.terminal)
+		if (!terminal.equals(other.terminal))
 			return false;
-		if (noTerminal != other.noTerminal)
+		if (!noTerminal.equals(other.noTerminal))
 			return false;
 		return true;
 
