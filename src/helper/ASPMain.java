@@ -24,11 +24,13 @@ package src.helper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
-
+import java.util.Stack;
 import src.helper.clases.Produccion;
 
 /**
@@ -41,86 +43,89 @@ import src.helper.clases.Produccion;
  */
 public class ASPMain {
 
-	private static Scanner teclado;
+    private static Scanner teclado;
 
-	public static void main(String[] ar) {
+    public static void main(String[] ar) {
 
-		List<Produccion> producciones = new ArrayList<Produccion>();
-		List<String> derecha = new ArrayList<String>();
-		ASPHelper helper = null;
-		String ladoIzq;
-		String separador;
+        List<Produccion> producciones = new ArrayList<Produccion>();
+        List<String> derecha = new ArrayList<String>();
+        ASPHelper helper = null;
+        String ladoIzq;
+        String separador;
+        Queue<String> input = new LinkedList<String>();
+        Stack<String> stack = new Stack<String>();
 
-		teclado = new Scanner(System.in);
-		System.out
-				.println("Cualquier contenido ingresado despues de un espacio en blanco sera ignorado\nVacio se representa con: vacio");
-		System.out.println();
+        teclado = new Scanner(System.in);
+        System.out
+                .println("Cualquier contenido ingresado despues de un espacio en blanco sera ignorado\nVacio se representa con: vacio");
+        System.out.println();
 
-		String entrada;
-		teclado = new Scanner(System.in);
+        String entrada;
+        teclado = new Scanner(System.in);
 
-		System.out
-				.println("Ingrese separador a utilizar en el lado derecho de las producciones");
-		separador = teclado.next();
+        System.out
+                .println("Ingrese separador a utilizar en el lado derecho de las producciones");
+        separador = teclado.next();
 
-		System.out.println("Ingrese producciones, para terminar ingrese FIN");
-		entrada = teclado.next();
+        System.out.println("Ingrese producciones, para terminar ingrese FIN");
+        entrada = teclado.next();
 
-		while (!entrada.equals("FIN")) {
-			if (!entrada.contains("->")) {
-				System.out.println("produccion invalida");
-				teclado.nextLine();
-				entrada = teclado.next();
-				continue;
-			}
+        while (!entrada.equals("FIN")) {
+            if (!entrada.contains("->")) {
+                System.out.println("produccion invalida");
+                teclado.nextLine();
+                entrada = teclado.next();
+                continue;
+            }
 
-			String[] entradas = entrada.split("->", 2);
+            String[] entradas = entrada.split("->", 2);
 
-			if (entradas[1].equals("")) {
-				System.out.println("falta lado derecho");
-				teclado.nextLine();
-				entrada = teclado.next();
-				continue;
-			}
+            if (entradas[1].equals("")) {
+                System.out.println("falta lado derecho");
+                teclado.nextLine();
+                entrada = teclado.next();
+                continue;
+            }
 
-			String[] variables = entradas[1].split(separador);
-			ladoIzq = (entradas[0]);
-			derecha = new ArrayList<String>();
+            String[] variables = entradas[1].split(separador);
+            ladoIzq = (entradas[0]);
+            derecha = new ArrayList<String>();
 
-			int k;
-			for (k = 0; k < variables.length; k++) {
-				if (!variables[k].equals(""))
-					derecha.add(variables[k]);
-			}
-			producciones.add(new Produccion(ladoIzq, derecha, false));
-			teclado.nextLine();
-			entrada = teclado.next();
-		}
+            int k;
+            for (k = 0; k < variables.length; k++) {
+                if (!variables[k].equals("")) {
+                    derecha.add(variables[k]);
+                }
+            }
+            producciones.add(new Produccion(ladoIzq, derecha, false));
+            teclado.nextLine();
+            entrada = teclado.next();
+        }
 
-		// Impresion y llamada a funcion primero
+        // Impresion y llamada a funcion primero
 
-		helper = new ASPHelper(producciones);
-		Set<String> noTerminales = helper.getNoTerminales();
-		System.out.println("Gramatica ingresada:");
-		for (Produccion prod : producciones) {
-			System.out.println(prod);
-		}
-		Map<String, Set<String>> primeros = new HashMap<String, Set<String>>();
-		Map<String, Set<String>> siguientes = new HashMap<String, Set<String>>();
-		for (String it : noTerminales) {
-			helper = new ASPHelper(producciones);
-			Set<String> temp = helper.getPrimero(it);
-			System.out.println("Primero de " + it + temp);
-			primeros.put(it, temp);
-		}
-		for (String it : noTerminales) {
-			helper = new ASPHelper(producciones);
-			Set<String> temp = helper.getSiguiente(primeros, it);
-			System.out.println("Siguiente de " + it + temp);
-			siguientes.put(it, temp);
-		}
-		ASPTable tabla = new ASPTable(primeros, siguientes, producciones);
-		System.out.println(tabla.generarTablaASP());
+        helper = new ASPHelper(producciones);
+        Set<String> noTerminales = helper.getNoTerminales();
+        System.out.println("Gramatica ingresada:");
+        for (Produccion prod : producciones) {
+            System.out.println(prod);
+        }
+        Map<String, Set<String>> primeros = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> siguientes = new HashMap<String, Set<String>>();
+        for (String it : noTerminales) {
+            helper = new ASPHelper(producciones);
+            Set<String> temp = helper.getPrimero(it);
+            System.out.println("Primero de " + it + temp);
+            primeros.put(it, temp);
+        }
+        for (String it : noTerminales) {
+            helper = new ASPHelper(producciones);
+            Set<String> temp = helper.getSiguiente(primeros, it);
+            System.out.println("Siguiente de " + it + temp);
+            siguientes.put(it, temp);
+        }
+        ASPTable tabla = new ASPTable(primeros, siguientes, producciones);
+        System.out.println(tabla.generarTablaASP());
 
-	}
+    }
 }
