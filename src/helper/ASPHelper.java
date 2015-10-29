@@ -80,7 +80,7 @@ public class ASPHelper {
 	 * @param variable
 	 * @return
 	 */
-	private boolean esTerminal(String variable) {
+	public boolean esTerminal(String variable) {
 
 		for (Produccion prod : getProducciones()) {
 			if (prod.getIzquierda().contains(variable)) {

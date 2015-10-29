@@ -13,15 +13,17 @@ public class Key {
 	private String noTerminal;
 
 	public Key(String noTerminal, String terminal) {
-		this.noTerminal = terminal;
-		this.terminal = noTerminal;
+		this.noTerminal = noTerminal;
+		this.terminal = terminal;
 
 	}
 
 	@Override
 	public int hashCode() {
-
-		return terminal.hashCode() + noTerminal.hashCode();
+		int aRet = 1;
+		aRet = 31 + terminal.hashCode();
+		aRet = aRet * 31 + noTerminal.hashCode();
+		return aRet;
 	}
 
 	@Override
@@ -39,6 +41,11 @@ public class Key {
 			return false;
 		return true;
 
+	}
+
+	@Override
+	public String toString() {
+		return "M[" + this.noTerminal + "," + this.terminal + "]";
 	}
 
 	public String getTerminal() {
