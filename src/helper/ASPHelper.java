@@ -25,6 +25,7 @@ package src.helper;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import src.helper.clases.Produccion;
@@ -41,6 +42,8 @@ public class ASPHelper {
 	public static final String VACIO = "vacio";
 	private List<Produccion> producciones;
 	private List<String> conjuntoPrimero;
+	private List<String> siguientesEnProceso;
+
 
 	public ASPHelper(List<Produccion> producciones) {
 
@@ -184,6 +187,81 @@ public class ASPHelper {
 	public void setConjuntoPrimero(List<String> conjuntoPrimero) {
 
 		this.conjuntoPrimero = conjuntoPrimero;
+	}
+
+
+	public Set<String> getSiguiente(Map<String,Set<String>> primeros, String variable) {
+
+		siguientesEnProceso = new ArrayList<String>();
+		return siguiente(primeros,variable);
+	}
+
+
+	private Set<String> siguiente(Map<String,Set<String>> primeros, String variable) {
+
+		int index;
+		Set<String> siguiente = new HashSet<String>();
+		Produccion raiz = producciones.get(0);
+
+		siguientesEnProceso.add(variable);
+
+		//Se agrega "$" en siguiente(S) si S es el simbolo inicial
+		if(variable.equals(raiz.getIzquierda()))
+			siguiente.add("$");
+		
+		for (Produccion prod : getProducciones()) {
+			if ((index = prod.getDerecha().indexOf(variable))!=-1) {
+
+				//Se agrega "$" en siguiente(S) si S es el simbolo inicial
+				if(prod.equals(raiz))
+					siguiente.add("$");
+				//Si variable es el ultimo simbolo del lado derecho del a produccion 
+				//se incluye al siguiente el siguiente del lado izquierdo
+				if(prod.getDerecha().size()==(index+1))
+				{
+					//Se calcula el siguiente solo si ya no fue calculado
+					if(!siguientesEnProceso.contains(prod.getIzquierda()))
+						siguiente.addAll(siguiente(primeros, prod.getIzquierda()));
+				}
+				//sino se calcula el primero de lo que este a la derecha de variable
+				else{
+					int k;
+					for(k = index+1;k<=prod.getDerecha().size()-1;k++)
+					{
+						Set<String> set = primeros.get(prod.getDerecha().get(k));
+						//si es un terminal simplemente se agrega dicho terminal y se termina con esta produccion
+						if(set==null)
+						{
+							siguiente.add(prod.getDerecha().get(k));
+							break;
+						}
+						//sino se agrega el primero
+						siguiente.addAll(set);
+						//Si no contiene vacio se termina con la produccion, sino se continua calculando el primero del
+						//siguiente simbolo de la produccion
+						if(!set.contains("vacio"))
+						{
+							break;
+						}
+					}
+					//si el primero contiene vacio, se procede a agregar tambien el siguiente del lado izquierdo de la produccion
+					if(siguiente.contains("vacio"))
+					{
+						siguiente.remove("vacio");
+						//se verifica si el segundo ya fue calculado
+						if(!siguientesEnProceso.contains(prod.getIzquierda()))
+							siguiente.addAll(siguiente(primeros, prod.getIzquierda()));
+					}
+				}
+
+			}
+		}
+		siguientesEnProceso.remove(variable);
+		return siguiente;
+	}
+
+	public void limpiarConjunto(){
+		setConjuntoPrimero(new ArrayList<String>());
 	}
 
 }
