@@ -68,7 +68,8 @@ public class ASPTable {
 			for (String variable : getConjuntoPrimero()
 					.get(prod.getIzquierda())) {
 
-				if (helper.esTerminal(variable)) {
+				if (helper.esTerminal(variable)
+						&& !variable.equals(ASPHelper.VACIO)) {
 					// Se controla que si ya tenia un valor para el actual par
 					// terminal/noTerminal, entonces se agrega uno mas a la
 					// lista, de lo contrario se crea una lista nueva y se
@@ -82,38 +83,47 @@ public class ASPTable {
 						getTablaASP().get(key).add(prod);
 					}
 				}
-				// Se controla que el primero de alfa tenga vacio, es decir
-				// todos los primeros del lado derecho de A tengan primero
-				for (String a : prod.getDerecha()) {
-					if (!helper.esTerminal(a)
-							&& !getConjuntoPrimero().get(a).contains(
-									ASPHelper.VACIO)) {
-						tieneVacio = false;
-						break;
-					}
-					if (helper.esTerminal(a)) {
-						tieneVacio = false;
-						break;
-					}
+			}
+
+			// Se controla que el primero de alfa tenga vacio, es decir
+			// todos los primeros del lado derecho de A tengan primero
+			tieneVacio = true;
+			for (String a : prod.getDerecha()) {
+				if (!helper.esTerminal(a)
+						&& !getConjuntoPrimero().get(a).contains(
+								ASPHelper.VACIO)) {
+					tieneVacio = false;
+					break;
 				}
-				// Si tiene vacio entonces para cada terminal de SIGUIENTE(A)
-				// agregar A->alfa a M[A,a]
-				if (tieneVacio) {
-					for (String siguiente : getConjuntoSiguiente().get(
-							prod.getIzquierda())) {
-						if (helper.esTerminal(siguiente)) {
-							Key key = new Key(prod.getIzquierda(), siguiente);
-							if (getTablaASP().get(key) == null) {
-								List<Produccion> prodToAdd = new ArrayList<Produccion>();
-								prodToAdd.add(prod);
-								getTablaASP().put(key, prodToAdd);
-							} else {
-								getTablaASP().get(key).add(prod);
-							}
+				if (a.equals(ASPHelper.VACIO)) {
+					tieneVacio = true;
+					break;
+				}
+				if (helper.esTerminal(a)) {
+					tieneVacio = false;
+					break;
+				}
+				
+			}
+			// Si tiene vacio entonces para cada terminal de SIGUIENTE(A)
+			// agregar A->alfa a M[A,a]
+			if (tieneVacio) {
+				for (String siguiente : getConjuntoSiguiente().get(
+						prod.getIzquierda())) {
+					if (helper.esTerminal(siguiente)
+							&& !siguiente.equals(ASPHelper.VACIO)) {
+						Key key = new Key(prod.getIzquierda(), siguiente);
+						if (getTablaASP().get(key) == null) {
+							List<Produccion> prodToAdd = new ArrayList<Produccion>();
+							prodToAdd.add(prod);
+							getTablaASP().put(key, prodToAdd);
+						} else {
+							getTablaASP().get(key).add(prod);
 						}
 					}
 				}
 			}
+
 		}
 
 		return getTablaASP();

@@ -52,17 +52,18 @@ public class ASPMain {
 		String separador;
 
 		teclado = new Scanner(System.in);
-		System.out.println("Cualquier contenido ingresado despues de un espacio en blanco sera ignorado\nVacio se representa con: vacio");
+		System.out
+				.println("Cualquier contenido ingresado despues de un espacio en blanco sera ignorado\nVacio se representa con: vacio");
 		System.out.println();
 
 		String entrada;
 		teclado = new Scanner(System.in);
 
-		System.out.println("Ingrese separador a utilizar en el lado derecho de las producciones");
+		System.out
+				.println("Ingrese separador a utilizar en el lado derecho de las producciones");
 		separador = teclado.next();
 
-		System.out
-		.println("Ingrese producciones, para terminar ingrese FIN");
+		System.out.println("Ingrese producciones, para terminar ingrese FIN");
 		entrada = teclado.next();
 
 		while (!entrada.equals("FIN")) {
@@ -105,6 +106,7 @@ public class ASPMain {
 			System.out.println(prod);
 		}
 		Map<String, Set<String>> primeros = new HashMap<String, Set<String>>();
+		Map<String, Set<String>> siguientes = new HashMap<String, Set<String>>();
 		for (String it : noTerminales) {
 			helper = new ASPHelper(producciones);
 			Set<String> temp = helper.getPrimero(it);
@@ -113,8 +115,12 @@ public class ASPMain {
 		}
 		for (String it : noTerminales) {
 			helper = new ASPHelper(producciones);
-			System.out.println("Siguiente de " + it + helper.getSiguiente(primeros,it));
+			Set<String> temp = helper.getSiguiente(primeros, it);
+			System.out.println("Siguiente de " + it + temp);
+			siguientes.put(it, temp);
 		}
+		ASPTable tabla = new ASPTable(primeros, siguientes, producciones);
+		System.out.println(tabla.generarTablaASP());
 
 	}
 }
