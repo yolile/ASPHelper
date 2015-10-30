@@ -135,16 +135,17 @@ public class ASPMain {
 
 			// Impresion de la tabla ASP
 			System.out.println("Tabla ASP");
-			System.out.print("\t");
+			System.out.format("%20s", "");
 			terminales.remove("vacio");
 			terminales.add("$");
 			for (String term : terminales) {
-				System.out.print(term + "\t\t");
+				System.out.format("%20s", term);
 			}
 			boolean esAmbigua = false;
 			for (String noTerm : noTerminales) {
 				System.out.println();
-				System.out.print(noTerm + "\t");
+				System.out.format("%20s", noTerm);
+				// System.out.print(noTerm + "\t");
 				for (String term : terminales) {
 					Key key = new Key(noTerm, term);
 					if (tablaGen.get(key) == null) {
@@ -152,14 +153,14 @@ public class ASPMain {
 							List<Produccion> pp = new ArrayList<Produccion>();
 							pp.add(new Produccion("sinc", null, false));
 							tablaGen.put(key, pp);
-							System.out.print("sinc\t");
+							System.out.format("%20s", "sinc");
 						} else {
 
-							System.out.print("error\t");
+							System.out.format("%20s", "error");
 						}
 					} else {
 						for (Produccion prod : tablaGen.get(key)) {
-							System.out.print(prod + "\t");
+							System.out.format("%20s", prod);
 						}
 						if (tablaGen.get(key).size() > 1) {
 							esAmbigua = true;
