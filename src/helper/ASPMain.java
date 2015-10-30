@@ -45,106 +45,160 @@ import src.helper.clases.Produccion;
  */
 public class ASPMain {
 
-    private static Scanner teclado;
+	private static Scanner teclado;
 
-    public static void main(String[] ar) {
+	public static void main(String[] ar) {
 
-        List<Produccion> producciones = new ArrayList<Produccion>();
-        List<String> derecha = new ArrayList<String>();
-        ASPHelper helper = null;
-        String ladoIzq;
-        String separador;
-        Queue<String> input = new LinkedList<String>();
-        Stack<String> stack = new Stack<String>();
+		while (true) {
+			List<Produccion> producciones = new ArrayList<Produccion>();
+			List<String> derecha = new ArrayList<String>();
+			ASPHelper helper = null;
+			String ladoIzq;
+			String separador;
+			Queue<String> input = new LinkedList<String>();
+			Stack<String> stack = new Stack<String>();
 
-        teclado = new Scanner(System.in);
-        System.out
-                .println("Cualquier contenido ingresado despues de un espacio en blanco sera ignorado\nVacio se representa con: vacio");
-        System.out.println();
+			teclado = new Scanner(System.in);
+			System.out
+					.println("Cualquier contenido ingresado despues de un espacio en blanco sera ignorado\nVacio se representa con: vacio");
+			System.out.println();
 
-        String entrada;
-        teclado = new Scanner(System.in);
+			String entrada;
+			teclado = new Scanner(System.in);
 
-        System.out
-                .println("Ingrese separador a utilizar en el lado derecho de las producciones");
-        separador = teclado.next();
+			System.out
+					.println("Ingrese separador a utilizar en el lado derecho de las producciones");
+			separador = teclado.next();
 
-        System.out.println("Ingrese producciones, para terminar ingrese FIN");
-        entrada = teclado.next();
+			System.out
+					.println("Ingrese producciones, para terminar ingrese FIN");
+			entrada = teclado.next();
 
-        while (!entrada.equals("FIN")) {
-            if (!entrada.contains("->")) {
-                System.out.println("produccion invalida");
-                teclado.nextLine();
-                entrada = teclado.next();
-                continue;
-            }
+			while (!entrada.equals("FIN")) {
+				if (!entrada.contains("->")) {
+					System.out.println("produccion invalida");
+					teclado.nextLine();
+					entrada = teclado.next();
+					continue;
+				}
 
-            String[] entradas = entrada.split("->", 2);
+				String[] entradas = entrada.split("->", 2);
 
-            if (entradas[1].equals("")) {
-                System.out.println("falta lado derecho");
-                teclado.nextLine();
-                entrada = teclado.next();
-                continue;
-            }
+				if (entradas[1].equals("")) {
+					System.out.println("falta lado derecho");
+					teclado.nextLine();
+					entrada = teclado.next();
+					continue;
+				}
 
-            String[] variables = entradas[1].split(separador);
-            ladoIzq = (entradas[0]);
-            derecha = new ArrayList<String>();
+				String[] variables = entradas[1].split(separador);
+				ladoIzq = (entradas[0]);
+				derecha = new ArrayList<String>();
 
-            int k;
-            for (k = 0; k < variables.length; k++) {
-                if (!variables[k].equals("")) {
-                    derecha.add(variables[k]);
-                }
-            }
-            producciones.add(new Produccion(ladoIzq, derecha, false));
-            teclado.nextLine();
-            entrada = teclado.next();
-        }
-        
-        
-        // Impresion y llamada a funcion primero
+				int k;
+				for (k = 0; k < variables.length; k++) {
+					if (!variables[k].equals("")) {
+						derecha.add(variables[k]);
+					}
+				}
+				producciones.add(new Produccion(ladoIzq, derecha, false));
+				teclado.nextLine();
+				entrada = teclado.next();
+			}
 
-        helper = new ASPHelper(producciones);
-        Set<String> noTerminales = helper.getNoTerminales();
-        System.out.println("Gramatica ingresada:");
-        for (Produccion prod : producciones) {
-            System.out.println(prod);
-        }
-        Map<String, Set<String>> primeros = new HashMap<String, Set<String>>();
-        Map<String, Set<String>> siguientes = new HashMap<String, Set<String>>();
-        for (String it : noTerminales) {
-            helper = new ASPHelper(producciones);
-            Set<String> temp = helper.getPrimero(it);
-            System.out.println("Primero de " + it + temp);
-            primeros.put(it, temp);
-        }
-        for (String it : noTerminales) {
-            helper = new ASPHelper(producciones);
-            Set<String> temp = helper.getSiguiente(primeros, it);
-            System.out.println("Siguiente de " + it + temp);
-            siguientes.put(it, temp);
-        }
-        ASPTable tabla = new ASPTable(primeros, siguientes, producciones);
-        Map<Key, List<Produccion>> tablaGen = (tabla.generarTablaASP());
-        System.out.println(tablaGen);
-        
-        System.out.println("Ingrese Entrada a probar");
-        teclado.nextLine();
-        entrada = teclado.next();
-        String[] entradas = entrada.split(separador);
-        
-        for(int k=0; k< entradas.length; k++)
-        {
-        	input.add(entradas[k]);
-        }
-        
-        stack.add("$");
-        stack.add(producciones.get(0).getIzquierda());
-        
-        ASPParser.parser(input, stack, tablaGen, producciones); 
-                
-    }
+			// Impresion y llamada a funcion primero
+
+			helper = new ASPHelper(producciones);
+			Set<String> noTerminales = helper.getNoTerminales();
+			Set<String> terminales = helper.getTerminales();
+			System.out.println("Gramatica ingresada:");
+			for (Produccion prod : producciones) {
+				System.out.println(prod);
+			}
+			Map<String, Set<String>> primeros = new HashMap<String, Set<String>>();
+			Map<String, Set<String>> siguientes = new HashMap<String, Set<String>>();
+			for (String it : noTerminales) {
+				helper = new ASPHelper(producciones);
+				Set<String> temp = helper.getPrimero(it);
+				System.out.println("Primero de " + it + temp);
+				primeros.put(it, temp);
+			}
+			for (String it : noTerminales) {
+				helper = new ASPHelper(producciones);
+				Set<String> temp = helper.getSiguiente(primeros, it);
+				System.out.println("Siguiente de " + it + temp);
+				siguientes.put(it, temp);
+			}
+			// Se genera la tabla ASP
+			ASPTable tabla = new ASPTable(primeros, siguientes, producciones);
+			Map<Key, List<Produccion>> tablaGen = (tabla.generarTablaASP());
+
+			// Impresion de la tabla ASP
+			System.out.println("Tabla ASP");
+			System.out.print("\t");
+			terminales.remove("vacio");
+			terminales.add("$");
+			for (String term : terminales) {
+				System.out.print(term + "\t\t");
+			}
+			boolean esAmbigua = false;
+			for (String noTerm : noTerminales) {
+				System.out.println();
+				System.out.print(noTerm + "\t");
+				for (String term : terminales) {
+					Key key = new Key(noTerm, term);
+					if (tablaGen.get(key) == null) {
+						if (siguientes.get(noTerm).contains(term)) {
+							List<Produccion> pp = new ArrayList<Produccion>();
+							pp.add(new Produccion("sinc", null, false));
+							tablaGen.put(key, pp);
+							System.out.print("sinc\t");
+						} else {
+
+							System.out.print("error\t");
+						}
+					} else {
+						for (Produccion prod : tablaGen.get(key)) {
+							System.out.print(prod + "\t");
+						}
+						if (tablaGen.get(key).size() > 1) {
+							esAmbigua = true;
+						}
+
+					}
+
+				}
+
+			}
+
+			if (esAmbigua) {
+				System.out.println("\nLa gramatica es ambigua!");
+			} else {
+
+				// Seccion de generar derivacion
+				System.out.println();
+				System.out.println("Ingrese Entrada a probar");
+				teclado.nextLine();
+				entrada = teclado.next();
+				String[] entradas = entrada.split(separador);
+
+				for (int k = 0; k < entradas.length; k++) {
+					input.add(entradas[k]);
+				}
+
+				stack.add("$");
+				stack.add(producciones.get(0).getIzquierda());
+
+				ASPParser.parser(input, stack, tablaGen, producciones);
+			}
+			System.out.println();
+			System.out.println("Ingrese SI si desea ingresar otra gramatica");
+			teclado.nextLine();
+			entrada = teclado.next();
+			if (!entrada.equals("SI")) {
+				break;
+			}
+		}
+
+	}
 }
